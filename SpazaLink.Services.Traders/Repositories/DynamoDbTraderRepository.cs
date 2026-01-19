@@ -54,6 +54,12 @@ namespace SpazaLink.Services.Traders.Repositories
             if (!string.IsNullOrEmpty(trader.Email))
                 item["Email"] = new AttributeValue { S = trader.Email };
 
+            if (!string.IsNullOrEmpty(trader.Landmark))
+                item["Landmark"] = new AttributeValue { S = trader.Landmark };
+
+            if (!string.IsNullOrEmpty(trader.IDNumber))
+                item["IDNumber"] = new AttributeValue { S = trader.IDNumber };
+
             // Store the trader in DynamoDB
             await _dynamoDb.PutItemAsync(_tableName, item);
             return trader;
@@ -123,7 +129,9 @@ namespace SpazaLink.Services.Traders.Repositories
                 RegistrationDate = DateTime.Parse(item["RegistrationDate"].S),
                 ProductCategories = item["ProductCategories"].SS.ToList(),
                 WhatsappNumber = item.ContainsKey("WhatsappNumber") ? item["WhatsappNumber"].S : null,
-                Email = item.ContainsKey("Email") ? item["Email"].S : null
+                Email = item.ContainsKey("Email") ? item["Email"].S : null,
+                Landmark = item.ContainsKey("Landmark") ? item["Landmark"].S : string.Empty,
+                IDNumber = item.ContainsKey("IDNumber") ? item["IDNumber"].S : null
             };
         }
     }
