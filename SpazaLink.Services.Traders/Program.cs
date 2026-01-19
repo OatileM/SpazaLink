@@ -1,76 +1,37 @@
-using SpazaLink.Shared.Models;
+using Amazon.DynamoDBv2;
+using SpazaLink.Shared.Constants;
 using SpazaLink.Shared.DTOs;
 using SpazaLink.Shared.Enums;
-using SpazaLink.Shared.Constants;
+using SpazaLink.Shared.Models;
+using SpazaLink.Services.Traders.Repositories;
 
+// Create web application builder
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Configure services
+builder.Services.AddOpenApi(); // Add OpenAPI/Swagger support
+builder.Services.AddAWSService<IAmazonDynamoDB>(); // Register AWS DynamoDB client
+builder.Services.AddScoped<ITraderRepository, DynamoDbTraderRepository>(); // Register trader repository
 
+// Build the application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi(); // Enable OpenAPI in development
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Enforce HTTPS
 
-var summaries = new[]
+// API Endpoints
+
+/// <summary>
+/// Creates a new trader registration
+/// </summary>
+app.MapPost("/createtrader", async (CreateTraderRequest req, ITraderRepository repository) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-var trader = new Trader
-{
-    BusinessName = "Mama's Spaza",
-    OwnerName = "Mama Jane",
-    PhoneNumber = "0123456789",
-    Area = "Downtown",
-    Street = "Main St",
-    Type = TraderType.SpazaShop,
-    ProductCategories = new List<string> { "Groceries", "Snacks" },
-    Status = TraderStatus.Active,
-    Tier = TraderTier.Bronze,
-    isVerified = true,
-    RegistrationDate = DateTime.UtcNow
-};
-
-var request = new CreateTraderRequest
-{
-    BusinessName = "Papa's TuckShop",
-    OwnerName = "Papa John",
-    PhoneNumber = "0987654321",
-    Area = "Uptown",
-    Street = "2nd Ave",
-    Type = TraderType.TuckShop,
-    ProductCategories = new List<string> { "Beverages", "Fast Food" },
-    WhatsAppNumber = "0987654321",
-    Email = "osmdlela@gmail.com"
-};
-
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-
-app.MapPost("/createtrader", (CreateTraderRequest req) =>
-{
-    // Here you would normally add logic to save the trader to a database
+    // Map request DTO to trader entity with default values
     var newTrader = new Trader
     {
         BusinessName = req.BusinessName,
@@ -82,18 +43,43 @@ app.MapPost("/createtrader", (CreateTraderRequest req) =>
         ProductCategories = req.ProductCategories,
         WhatsappNumber = req.WhatsAppNumber,
         Email = req.Email,
-        Status = TraderStatus.PendingVerification,
-        Tier = TraderTier.Bronze,
-        isVerified = false,
+        Status = TraderStatus.PendingVerification, // New traders start as pending
+        Tier = TraderTier.Bronze, // All new traders start at Bronze tier
+        isVerified = false, // Verification required
         RegistrationDate = DateTime.UtcNow
     };
-    // Simulate saving to database and returning the created trader
-    return Results.Created($"/traders/{newTrader.ID}", newTrader);
-});
 
-app.Run();
+    // Save trader to database
+    var createdTrader = await repository.CreateTraderAsync(newTrader);
+    return Results.Created($"/traders/{createdTrader.ID}", createdTrader);
+})
+.WithName("CreateTrader")
+.WithSummary("Register a new trader")
+.WithDescription("Creates a new trader registration with pending verification status");
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+/// <summary>
+/// Retrieves a trader by their unique ID
+/// </summary>
+app.MapGet("/traders/{id:guid}", async (Guid id, ITraderRepository repository) =>
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+    var trader = await repository.GetTraderByIdAsync(id);
+    return trader is not null ? Results.Ok(trader) : Results.NotFound();
+})
+.WithName("GetTraderById")
+.WithSummary("Get trader by ID")
+.WithDescription("Retrieves a specific trader using their unique identifier");
+
+/// <summary>
+/// Retrieves all traders in a specific area
+/// </summary>
+app.MapGet("/traders/area/{area}", async (string area, ITraderRepository repository) =>
+{
+    var traders = await repository.GetTradersByAreaAsync(area);
+    return Results.Ok(traders);
+})
+.WithName("GetTradersByArea")
+.WithSummary("Get traders by area")
+.WithDescription("Retrieves all traders operating in a specific geographical area");
+
+// Start the application
+app.Run();

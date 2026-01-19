@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="SpazaLink.Services.Traders/SpazaLink.Services.Traders.csproj" />
   <Project Path="SpazaLink.Shared/SpazaLink.Shared.csproj" />
+  <Project Path="SpazaLink.Services.Traders.Tests/SpazaLink.Services.Traders.Tests.csproj" />
 </Solution>
