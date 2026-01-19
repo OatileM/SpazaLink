@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SpazaLink.Services.Traders/SpazaLink.Services.Traders.csproj" />
+  <Project Path="SpazaLink.Shared/SpazaLink.Shared.csproj" />
+</Solution>
