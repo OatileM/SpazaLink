@@ -1,0 +1,6 @@
+@SpazaLink.Services.Inventory_HostAddress = http://localhost:5077
+
+GET {{SpazaLink.Services.Inventory_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

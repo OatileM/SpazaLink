@@ -9,8 +9,10 @@ SpazaLink is a microservices-based solution designed to digitize and connect sma
 ## Architecture
 
 - **SpazaLink.Services.Traders**: Web API service for trader management
+- **SpazaLink.Services.Inventory**: Product catalog and supplier management API
 - **SpazaLink.Shared**: Common models, DTOs, enums, and utilities
 - **SpazaLink.Services.Traders.Tests**: Unit tests for the trader service
+- **SpazaLink.Services.Inventory.Tests**: Unit and integration tests for inventory service
 
 ## Features
 
@@ -39,6 +41,12 @@ SpazaLink is a microservices-based solution designed to digitize and connect sma
 - `POST /createtrader` - Register a new trader
 - `GET /traders/{id}` - Get trader by ID
 - `GET /traders/area/{area}` - Get traders by area
+
+### Inventory Service
+
+- `GET /products` - Search products with filters (category, price range)
+- `GET /products/{id}` - Get product details
+- `GET /products/{id}/price` - Calculate price based on quantity
 
 ## Technology Stack
 
@@ -99,6 +107,11 @@ SpazaLink/
 │   │   └── DynamoDbTraderRepository.cs # DynamoDB implementation
 │   ├── Program.cs                      # API endpoints and configuration
 │   └── appsettings.json               # Configuration settings
+├── SpazaLink.Services.Inventory/        # Product catalog API
+│   ├── Repositories/                    # Data access layer
+│   │   ├── IProductRepository.cs       # Product repository interface
+│   │   └── DynamoDbProductRepository.cs # DynamoDB implementation
+│   └── Program.cs                      # API endpoints and configuration
 ├── SpazaLink.Shared/                   # Shared components
 │   ├── Models/                         # Domain models
 │   │   ├── Trader.cs                  # Trader entity
@@ -113,6 +126,9 @@ SpazaLink/
 │   └── Validators/                    # Input validation
 ├── SpazaLink.Services.Traders.Tests/   # Unit tests
 │   └── Repositories/                   # Repository tests
+├── SpazaLink.Services.Inventory.Tests/ # Inventory service tests
+│   ├── Repositories/                   # Repository tests
+│   └── Integration/                    # Integration tests
 └── README.md
 ```
 
