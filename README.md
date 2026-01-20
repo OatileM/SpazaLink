@@ -17,6 +17,8 @@ SpazaLink is a microservices-based solution designed to digitize and connect sma
 - Trader registration and profile management
 - Multi-tier trader classification (Bronze, Silver, Gold, Platinum)
 - Support for various trader types (Spaza Shop, Street Vendor, Tuck Shop, Home Business)
+- Product catalog management with supplier integration
+- Supplier network with delivery area mapping
 - Verification system with KYC capabilities
 - Multiple payment method support
 - Multi-channel notifications (SMS, WhatsApp, Email)
@@ -99,8 +101,13 @@ SpazaLink/
 │   └── appsettings.json               # Configuration settings
 ├── SpazaLink.Shared/                   # Shared components
 │   ├── Models/                         # Domain models
+│   │   ├── Trader.cs                  # Trader entity
+│   │   ├── Product.cs                 # Product catalog entity
+│   │   └── Supplier.cs                # Supplier network entity
 │   ├── DTOs/                          # Data transfer objects
 │   ├── Enums/                         # Enumerations
+│   │   ├── TraderEnums.cs            # Trader-related enums
+│   │   └── SupplierTypeEnums.cs      # Supplier type classifications
 │   ├── Constants/                     # Application constants
 │   ├── Exceptions/                    # Custom exceptions
 │   └── Validators/                    # Input validation
@@ -113,6 +120,12 @@ SpazaLink/
 
 ### Trader
 Core trader entity with business information, location, status, and verification details.
+
+### Product
+Product catalog entity with pricing, categories, supplier information, and stock management.
+
+### Supplier
+Supplier network entity with contact details, delivery areas, and supplier type classification.
 
 ### CreateTraderRequest
 DTO for trader registration containing required business and contact information.
@@ -131,6 +144,13 @@ DTO for trader registration containing required business and contact information
 - **Silver**: R5k - R20k monthly turnover
 - **Gold**: R20k - R50k monthly turnover
 - **Platinum**: > R50k monthly or top 10%
+
+## Supplier Types
+
+- **Wholesaler**: Large retailers (Makro, Metro)
+- **Distributor**: Brand-specific distributors
+- **Manufacturer**: Direct from factory suppliers
+- **Local Producer**: Small local producers
 
 ## Testing
 
